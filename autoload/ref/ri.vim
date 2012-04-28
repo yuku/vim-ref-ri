@@ -66,7 +66,7 @@ function! s:source.get_keyword() " {{{2
 endfunction
 
 function! s:source.complete(query) " {{{2
-  return split(s:ri('').stdout, "\n")
+  return split(s:ri('-l -T').stdout, "\n")
 endfunction
 
 function! ref#ri#define() " {{{2
@@ -152,12 +152,8 @@ function! s:syntax() "
 endfunction
 
 " functions {{{1
-" detect_type {{{2
-" Detect the reference type from content.
-" - ['list', ''] (Matched list)
-" - ['class' class_name] (Summary of class)
-" - ['method', class_and_method_name] (Detail of method)
-function! s:detect_type()
+
+function! s:detect_type() " {{{2
   let line = getline(1)
   if stridx(line, '<') >= 0
     let name = matchstr(line, '^= \zs[^ ]\+\ze')
@@ -166,8 +162,19 @@ function! s:detect_type()
   return ['list', '']
 endfunction
 
+
+function! s:get_version() " {{{2
+  return split(matchstr(ref#system(ref#to_list(g:ref_ri_cmd, '--version')).stdout, '^ri \zs.*\ze$'), '\.')
+endfunction
+
 function! s:ri(args) " {{{2
-  return ref#system(ref#to_list(g:ref_ri_cmd, '--format=rdoc') + ref#to_list(a:args))
+  if s:get_version()[0] > 1
+    let format = 'rdoc'
+  else
+    let format = 'plain'
+  endif
+
+  return ref#system(ref#to_list(g:ref_ri_cmd, '--format='.format) + ref#to_list(a:args))
 endfunction
 
 " vim: foldmethod=marker
