@@ -62,7 +62,7 @@ function! s:source.get_keyword() " {{{2
       end
     endif
   endif
-  return expand('<cword>')
+  return ref#get_text_on_cursor('\v((\w+\:\:)*(\w+[.#]))?\w+[!?]{0,1}')
 endfunction
 
 function! s:source.complete(query) " {{{2
