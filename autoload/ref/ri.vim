@@ -86,8 +86,8 @@ function! s:syntax() "
   syntax sync linebreaks=1
 
   " RDoc text markup
-  syntax region rdocBold      start=/\\\@<!\(^\|\A\)\@=\*\(\s\|\W\)\@!\(\a\{1,}\s\|$\n\)\@!/ skip=/\\\*/ end=/\*\($\|\A\|\s\|\n\)\@=/ contains=@Spell
-  syntax region rdocEmphasis  start=/\\\@<!\(^\|\A\)\@=_\(\s\|\W\)\@!\(\a\{1,}\s\|$\n\)\@!/  skip=/\\_/  end=/_\($\|\A\|\s\|\n\)\@=/  contains=@Spell
+  syntax region rdocBold      start=/\\\@<!\(^\|\A\)\@=\*\(\s\|\W\)\@!\(\a\{1,}\s\|$\n\)\@!/ skip=/\\\*/ end=/$\|\*\($\|\A\|\s\|\n\)\@=/ contains=@Spell
+  syntax region rdocEmphasis  start=/\\\@<!\(^\|\A\)\@=_\(\s\|\W\)\@!\(\a\{1,}\s\|$\n\)\@!/  skip=/\\_/  end=/$\|_\($\|\A\|\s\|\n\)\@=/  contains=@Spell
   "syntax region rdocMonospace start=/\\\@<!\(^\|\A\)\@=+\(\s\|\W\)\@!\(\a\{1,}\s\|$\n\)\@!/  skip=/\\+/  end=/+\($\|\A\|\s\|\n\)\@=/  contains=@Spell
 
   " RDoc links: {link}[URL]
