@@ -47,6 +47,8 @@ endfunction
 
 function! s:source.opened(query) " {{{2
   call s:syntax()
+  setlocal concealcursor=nc
+  setlocal conceallevel=2
 endfunction
 
 function! s:source.get_keyword() " {{{2
@@ -112,10 +114,11 @@ function! s:syntax() "
   " RDoc pre-formatted markup
   " syntax region rdocCode      start=/\s*``[^`]*/          end=/[^`]*``\s*/
   syntax match  rdocCode  /^\s*\n\(\(\s\{1,}[^ ]\|\t\+[^\t]\).*\n\)\+/
-  syntax region rdocCode  start="<em[^>]*>"   end="</em>"
-  syntax region rdocCode  start="<tt[^>]*>"   end="</tt>"
-  syntax region rdocCode  start="<pre[^>]*>"  end="</pre>"
-  syntax region rdocCode  start="<code[^>]*>" end="</code>"
+  syntax match  rdocTag /<\/\?\(em\|tt\|pre\|code\)[^>]*>/ conceal
+  syntax match  rdocCode  /<em[^>]*>.*<\/em>/ contains=rdocTag
+  syntax match  rdocCode  /<tt[^>]*>.*<\/tt>/ contains=rdocTag
+  syntax match  rdocCode  /<pre[^>]*>.*<\/pre>/ contains=rdocTag
+  syntax match  rdocCode  /<code[^>]*>.*<\/code>/ contains=rdocTag
 
   " RDoc HTML headings
   syntax region htmlH1  start="^\s*="       end="\($\)" contains=@Spell
