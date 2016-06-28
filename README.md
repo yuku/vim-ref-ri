@@ -7,12 +7,52 @@ A [vim-ref](https://github.com/thinca/vim-ref) source for ri.
 
 ```vim
 :Ref ri Net::HTTP
+
+" instance method
+:Ref ri Net::HTTP#get
+
+" class method
+:Ref ri Net::HTTP.new
 ```
 
 ###Unite.vim
 
 ```vim
 :Unite ref/ri
+```
+
+##arguments
+This source accepts the argument of the following three forms.
+
+- class
+- class.class_method
+- class#instance_method
+
+##customizing
+<dl>
+  <dt>g:ref_ri_cmd</dt>
+  <dd>Specifies the ri command.</dd>
+  <dt>g:ref_ri_use_cache</dt>
+  <dd>
+    Cache the classes and methods at the time of completion.
+    The deault value is 0.
+  </dt>
+</dl>
+
+Cache are not cleared automatically. You may be necessary to following settings.
+
+```ruby
+# lib/rubygems_plugin.rb
+
+Gem.post_install do
+  cache_file = File.expand_path '~/.cache/vim-ref/ri/classes'
+  File.unlink cache_file is File.exist? cache_file
+end<`0`>
+
+Gem.post_uninstall do
+  cache_file = File.expand_path '~/.cache/vim-ref/ri/classes'
+  File.unlink cache_file is File.exist? cache_file
+end
 ```
 
 #Licence 
