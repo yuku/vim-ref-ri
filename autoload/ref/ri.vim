@@ -29,6 +29,10 @@ if !exists('g:ref_ri_cmd')
 endif
 let s:cmd = g:ref_ri_cmd
 
+if !exists('g:ref_ri_use_cache')
+  let g:ref_ri_use_cache = 0
+endif
+
 " source definition {{{1
 
 let s:source = {'name': 'ri'}
@@ -68,7 +72,45 @@ function! s:source.get_keyword() " {{{2
 endfunction
 
 function! s:source.complete(query) " {{{2
-  return split(s:ri('-l -T').stdout, "\n")
+  let classes = g:ref_ri_use_cache ?
+    \ self.cache('classes', function(self.classes_list)) :
+    \ self.classes_list('classes')
+  try
+    let [class, sep, method] =
+      \ matchlist(a:query,
+      \           '\([[:upper:]][[:alnum:]_]*\%(::[[:upper:]][[:alnum:]_]*\)*\)\(#\|\.\)\(.*\)')[1:3]
+  catch /E688/
+    let matched = filter(copy(classes), 'v:val =~# "^\\V" . a:query')
+    if empty(matched)
+      let matched = filter(copy(classes), 'v:val =~# "\\V" . a:query')
+    endif
+    return matched
+  catch
+    return []
+  endtry
+  if !empty(filter(copy(classes), 'v:val =~#  "^\\V" . class'))
+    let methods = g:ref_ri_use_cache ?
+      \ copy(self.cache(class, function(self.methods_list))) :
+      \ self.methods_list(class)
+    if sep == '#' " instance method
+      call filter(methods, 'v:val =~ "#"')
+    else " class method
+      call filter(methods, 'v:val !~ "#"')
+    endif
+    return filter(methods, 'v:val =~# "^\\V" . class . sep . method')
+  endif
+  return []
+endfunction
+
+function! s:source.classes_list(name) " {{{2
+  let classes = split(s:ri('-l -T').stdout, "\n")
+  return ref#uniq(classes)
+endfunction
+
+function! s:source.methods_list(class) " {{{2
+  let methods = split(s:ri(a:class . '.').stdout, "\n")[2:]
+  call map(methods, "substitute(v:val, '::\\([^:#]*\\)$', '.\\1', '')")
+  return ref#uniq(methods)
 endfunction
 
 function! ref#ri#define() " {{{2
